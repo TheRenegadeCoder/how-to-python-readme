@@ -7,10 +7,27 @@ import requests
 from bs4 import BeautifulSoup
 from snakemd import Document, Table, InlineText
 
-logger = logging.getLogger(__name__)
-
 
 def main() -> None:
+    """
+    The main drop in function for README generation.
+    """
+    loglevel = _get_log_level()
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError(f'Invalid log level: {loglevel}')
+    logging.basicConfig(level=numeric_level)
+    how_to = HowTo()
+    how_to.page.output_page("")
+
+
+def _get_log_level() -> str:
+    """
+    A helper function which gets the log level from 
+    the command line. Set as warning from default. 
+
+    :return: the log level provided by the user
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-log", 
@@ -22,16 +39,10 @@ def main() -> None:
         ),
     )
     options = parser.parse_args()
-    loglevel = options.log
-    numeric_level = getattr(logging, loglevel.upper(), None)
-    if not isinstance(numeric_level, int):
-        raise ValueError(f'Invalid log level: {loglevel}')
-    logging.basicConfig(level=numeric_level)
-    how_to = HowTo()
-    how_to.page.output_page("")
+    return options.log
 
 
-def get_intro_text() -> str:
+def _get_intro_text() -> str:
     return """
     Welcome to a collection of Jupyter Notebooks from the How to Python series on The Renegade Coder. For 
     convenience, you can access all of the articles, videos, challenges, and source code below. Alternatively, I keep 
@@ -64,36 +75,35 @@ def get_youtube_video(entry) -> InlineText:
     return InlineText("")
 
 
-def get_slug(title: str, sep: str):
+def get_slug(title: str, sep: str) -> str:
     return title.split(":")[0][:-10].lower().replace(" ", sep)
 
 
 def get_challenge(title: str) -> InlineText:
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
-    logger.debug(f"Trying {base}{slug}")
     challenge = InlineText("Challenge", url=f"{base}{slug}")
     if not challenge.verify_url():
-        return challenge
-    return InlineText("")
+        return InlineText("")
+    return challenge
 
 
-def get_notebook(title: str):
+def get_notebook(title: str) -> InlineText:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/notebooks/"
-    logger.debug(f"Trying {base}{slug}.ipynb")
-    request = requests.get(f"{base}{slug}.ipynb")
-    if request.status_code == 200:
-        return f"{base}{slug}.ipynb"
+    notebook = InlineText("Notebook", f"{base}{slug}.ipynb")
+    if not notebook.verify_url():
+        return InlineText("")
+    return notebook
 
 
-def get_test(title: str):
+def get_test(title: str) -> InlineText:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/testing/"
-    logger.debug(f"Trying {base}{slug}.py")
-    request = requests.get(f"{base}{slug}.py")
-    if request.status_code == 200:
-        return f"{base}{slug}.py"
+    test = InlineText("Test", f"{base}{slug}.py")
+    if not test.verify_url():
+        return InlineText("")
+    return test
 
 
 class HowTo:
@@ -111,7 +121,7 @@ class HowTo:
 
         # Introduction
         self.page.add_header("How to Python - Source Code")
-        self.page.add_paragraph(get_intro_text()) \
+        self.page.add_paragraph(_get_intro_text()) \
             .insert_link("How to Python", "https://therenegadecoder.com/series/how-to-python/") \
             .insert_link(
                 "an enormous article",
@@ -143,10 +153,8 @@ class HowTo:
                 article = InlineText("Article", url=entry.link)
                 youtube = get_youtube_video(entry)
                 challenge = get_challenge(entry.title)
-                notebook_url = get_notebook(entry.title)
-                notebook = InlineText("Notebook", url=notebook_url) if notebook_url else ""
-                test_url = get_test(entry.title)
-                test = InlineText("Test", url=test_url) if test_url else ""
+                notebook = get_notebook(entry.title)
+                test = get_test(entry.title)
                 body.append([
                     InlineText(str(index)),
                     InlineText(entry.title),
