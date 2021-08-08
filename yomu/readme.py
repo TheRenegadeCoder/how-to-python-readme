@@ -68,13 +68,14 @@ def get_slug(title: str, sep: str):
     return title.split(":")[0][:-10].lower().replace(" ", sep)
 
 
-def get_challenge(title: str):
+def get_challenge(title: str) -> InlineText:
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
     logger.debug(f"Trying {base}{slug}")
-    request = requests.get(f"{base}{slug}")
-    if request.status_code == 200:
-        return f"{base}{slug}"
+    challenge = InlineText("Challenge", url=f"{base}{slug}")
+    if not challenge.verify_url():
+        return challenge
+    return InlineText("")
 
 
 def get_notebook(title: str):
@@ -141,8 +142,7 @@ class HowTo:
             if "Code Snippets" not in entry.title:
                 article = InlineText("Article", url=entry.link)
                 youtube = get_youtube_video(entry)
-                challenge_url = get_challenge(entry.title)
-                challenge = InlineText("Challenge", url=challenge_url) if challenge_url else InlineText("")
+                challenge = get_challenge(entry.title)
                 notebook_url = get_notebook(entry.title)
                 notebook = InlineText("Notebook", url=notebook_url) if notebook_url else ""
                 test_url = get_test(entry.title)
