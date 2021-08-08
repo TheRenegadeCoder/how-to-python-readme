@@ -3,7 +3,6 @@ import logging
 from typing import Optional
 
 import feedparser
-import requests
 from bs4 import BeautifulSoup
 from snakemd import Document, InlineText, Table
 
@@ -52,7 +51,12 @@ def _get_intro_text() -> str:
     """
 
 
-def get_series_posts():
+def get_series_posts() -> list:
+    """
+    Collects all posts from the series into a feed. 
+
+    :return: a list of posts from the How to Python series
+    """
     index = 1
     base = "https://therenegadecoder.com/series/how-to-python/feed/?paged="
     feed = []
@@ -67,6 +71,9 @@ def get_youtube_video(entry) -> InlineText:
     Generates an InlineText item corresponding to the YouTube
     video link if it exists. Otherwise, it returns an empty
     InlineText element.
+
+    :param entry: a feedparser entry
+    :return: the YouTube video as an InlineText element
     """
     content = entry.content[0].value
     soup = BeautifulSoup(content, "html.parser")

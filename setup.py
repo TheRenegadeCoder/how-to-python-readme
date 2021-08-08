@@ -16,7 +16,6 @@ setuptools.setup(
     install_requires=[
         "feedparser>=6",
         "beautifulsoup4>=4",
-        "requests>=2",
         "SnakeMD>=0"
     ],
     entry_points={
