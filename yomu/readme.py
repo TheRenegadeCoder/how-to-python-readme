@@ -9,6 +9,11 @@ from snakemd import Document, Table, InlineText
 logger = logging.getLogger(__name__)
 
 
+def main() -> None:
+    how_to = HowTo()
+    how_to.page.output_page("")
+
+
 def get_intro_text() -> str:
     return """
     Welcome to a collection of Jupyter Notebooks from the How to Python series on The Renegade Coder. For 
@@ -137,3 +142,6 @@ class HowTo:
                 ])
                 index += 1
         return body
+
+if __name__ == '__main__':
+    main()
