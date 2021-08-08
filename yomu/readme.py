@@ -1,16 +1,18 @@
-import logging
 import argparse
+import logging
 from typing import Optional
 
 import feedparser
 import requests
 from bs4 import BeautifulSoup
-from snakemd import Document, Table, InlineText
+from snakemd import Document, InlineText, Table
 
 
 def main() -> None:
     """
     The main drop in function for README generation.
+
+    :return: nothing
     """
     loglevel = _get_log_level()
     numeric_level = getattr(logging, loglevel.upper(), None)
@@ -30,8 +32,8 @@ def _get_log_level() -> str:
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-log", 
-        "--log", 
+        "-log",
+        "--log",
         default="warning",
         help=(
             "Provide logging level. "
@@ -126,7 +128,7 @@ class HowTo:
             .insert_link(
                 "an enormous article",
                 "https://therenegadecoder.com/code/python-code-snippets-for-everyday-problems/"
-            )
+        )
 
         # Table
         headers = [
@@ -167,6 +169,7 @@ class HowTo:
                 ])
                 index += 1
         return body
+
 
 if __name__ == '__main__':
     main()
