@@ -20,7 +20,7 @@ setuptools.setup(
     ],
     entry_points={
         "console_scripts": [
-            'readme = yomu.readme:main'
+            'yomu = yomu.readme:main'
         ],
     },
     classifiers=(

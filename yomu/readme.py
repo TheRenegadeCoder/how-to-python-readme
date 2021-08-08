@@ -7,6 +7,9 @@ from bs4 import BeautifulSoup
 from snakemd import Document, InlineText, Table
 
 
+logger = logging.getLogger(__name__)
+
+
 def main() -> None:
     """
     The main drop in function for README generation.
@@ -63,6 +66,7 @@ def get_series_posts() -> list:
     while (rss := feedparser.parse(f"{base}{index}")).entries:
         feed.extend(rss.entries)
         index += 1
+    logger.debug(f"Collected {len(feed)} posts")
     return feed
 
 
