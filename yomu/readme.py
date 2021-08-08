@@ -1,4 +1,5 @@
 import logging
+import argparse
 from typing import Optional
 
 import feedparser
@@ -10,6 +11,22 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-log", 
+        "--log", 
+        default="warning",
+        help=(
+            "Provide logging level. "
+            "Example --log debug', default='warning'"
+        ),
+    )
+    options = parser.parse_args()
+    loglevel = options.log
+    numeric_level = getattr(logging, loglevel.upper(), None)
+    if not isinstance(numeric_level, int):
+        raise ValueError(f'Invalid log level: {loglevel}')
+    logging.basicConfig(level=numeric_level)
     how_to = HowTo()
     how_to.page.output_page("")
 
