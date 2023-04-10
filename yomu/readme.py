@@ -4,7 +4,7 @@ from typing import Optional
 
 import feedparser
 from bs4 import BeautifulSoup
-from snakemd import Document, InlineText, Table
+from snakemd import Document, Inline, Table
 
 
 logger = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def get_series_posts() -> list:
     return feed
 
 
-def get_youtube_video(entry) -> InlineText:
+def get_youtube_video(entry) -> Inline:
     """
     Generates an InlineText item corresponding to the YouTube
     video link if it exists. Otherwise, it returns an empty
@@ -84,38 +84,38 @@ def get_youtube_video(entry) -> InlineText:
     target = soup.find("h2", text="Video Summary")
     if target:
         url = target.find_next_sibling().find_all("a")[-1]["href"]
-        return InlineText("Video", url=url)
-    return InlineText("")
+        return Inline("Video", url=url)
+    return Inline("")
 
 
 def get_slug(title: str, sep: str) -> str:
     return title.split(":")[0][:-10].lower().replace(" ", sep)
 
 
-def get_challenge(title: str) -> InlineText:
+def get_challenge(title: str) -> Inline:
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
-    challenge = InlineText("Challenge", url=f"{base}{slug}")
+    challenge = Inline("Challenge", url=f"{base}{slug}")
     if not challenge.verify_url():
-        return InlineText("")
+        return Inline("")
     return challenge
 
 
-def get_notebook(title: str) -> InlineText:
+def get_notebook(title: str) -> Inline:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/notebooks/"
-    notebook = InlineText("Notebook", f"{base}{slug}.ipynb")
+    notebook = Inline("Notebook", f"{base}{slug}.ipynb")
     if not notebook.verify_url():
-        return InlineText("")
+        return Inline("")
     return notebook
 
 
-def get_test(title: str) -> InlineText:
+def get_test(title: str) -> Inline:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/testing/"
-    test = InlineText("Test", f"{base}{slug}.py")
+    test = Inline("Test", f"{base}{slug}.py")
     if not test.verify_url():
-        return InlineText("")
+        return Inline("")
     return test
 
 
@@ -153,25 +153,25 @@ class HowTo:
             "Testing"
         ]
         table = Table(
-            [InlineText(header) for header in headers],
+            [Inline(header) for header in headers],
             self.build_table()
         )
         self.page.add_element(table)
 
-    def build_table(self) -> list[list[InlineText]]:
+    def build_table(self) -> list[list[Inline]]:
         index = 1
         body = []
         for entry in self.feed:
             if "Code Snippets" not in entry.title:
-                article = InlineText("Article", url=entry.link)
+                article = Inline("Article", url=entry.link)
                 youtube = get_youtube_video(entry)
                 challenge = get_challenge(entry.title)
                 notebook = get_notebook(entry.title)
                 test = get_test(entry.title)
                 body.append([
-                    InlineText(str(index)),
-                    InlineText(entry.title),
-                    InlineText(entry.published),
+                    Inline(str(index)),
+                    Inline(entry.title),
+                    Inline(entry.published),
                     article,
                     youtube,
                     challenge,
