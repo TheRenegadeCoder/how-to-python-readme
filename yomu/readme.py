@@ -133,7 +133,7 @@ class HowTo:
         self.page = Document()
 
         # Introduction
-        self.page.add_header("How to Python - Source Code")
+        self.page.add_heading("How to Python - Source Code")
         self.page.add_paragraph(_get_intro_text()) \
             .insert_link("How to Python", "https://therenegadecoder.com/series/how-to-python/") \
             .insert_link(
@@ -156,7 +156,7 @@ class HowTo:
             [Inline(header) for header in headers],
             self.build_table()
         )
-        self.page.add_element(table)
+        self.page.add_block(table)
 
     def build_table(self) -> list[list[Inline]]:
         index = 1
