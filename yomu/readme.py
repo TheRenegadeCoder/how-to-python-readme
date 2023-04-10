@@ -107,8 +107,12 @@ def verify_url(url: str) -> bool:
     :return: True if the URL exists; False otherwise
     """
     try:
-        requests.get(url)
+        r = requests.get(url)
+        if r.status_code == 404:
+            logger.debug(f"URL does not exist: {url}")
+            return False
     except:
+        logger.warning(f"Issue loading URL: {url}")
         return False
     return True
 
@@ -125,7 +129,7 @@ def get_challenge(title: str) -> Inline:
 def get_notebook(title: str) -> Inline:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/notebooks/"
-    notebook = Inline("Notebook", f"{base}{slug}.ipynb")
+    notebook = Inline("Notebook", link=f"{base}{slug}.ipynb")
     if not verify_url(notebook._link):
         return Inline("")
     return notebook
@@ -134,7 +138,7 @@ def get_notebook(title: str) -> Inline:
 def get_test(title: str) -> Inline:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/testing/"
-    test = Inline("Test", f"{base}{slug}.py")
+    test = Inline("Test", link=f"{base}{slug}.py")
     if not verify_url(test._link):
         return Inline("")
     return test
