@@ -89,12 +89,25 @@ def get_youtube_video(entry) -> Inline:
 
 
 def get_slug(title: str, sep: str) -> str:
+    """
+    Converts a title to a slug.
+
+    :param title: title of item
+    :param sep: the separator to use in place of whitespace
+    :return: a slug from a title
+    """
     return title.split(":")[0][:-10].lower().replace(" ", sep)
 
 
 def verify_url(url: str) -> bool:
+    """
+    Checks that a URL exists. 
+
+    :param url: the URL to verify
+    :return: True if the URL exists; False otherwise
+    """
     try:
-        r = requests.get(url)
+        requests.get(url)
     except:
         return False
     return True
