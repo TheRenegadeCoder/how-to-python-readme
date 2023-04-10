@@ -118,6 +118,12 @@ def verify_url(url: str) -> bool:
 
 
 def get_challenge(title: str) -> Inline:
+    """
+    Retrieves the link to the challenge code samples.
+
+    :param title: the title of the article
+    :return: the link to the challenge folder, if it exists
+    """
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
     challenge = Inline("Challenge", link=f"{base}{slug}")
@@ -127,6 +133,12 @@ def get_challenge(title: str) -> Inline:
 
 
 def get_notebook(title: str) -> Inline:
+    """
+    Retrieves the link to the Jupyter Notebook for the article.
+
+    :param title: the title of the article
+    :return: the link to the notebook, if it exists
+    """
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/notebooks/"
     notebook = Inline("Notebook", link=f"{base}{slug}.ipynb")
@@ -136,6 +148,12 @@ def get_notebook(title: str) -> Inline:
 
 
 def get_test(title: str) -> Inline:
+    """
+    Retrieves the test file for the article.
+
+    :param title: the title of the article
+    :return: the link to the test, if it exists
+    """
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/testing/"
     test = Inline("Test", link=f"{base}{slug}.py")
