@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="yomu",
-    version="0.1.0",
+    version="0.2.0",
     author="The Renegade Coder",
     author_email="jeremy.grifski@therenegadecoder.com",
     description="Generates the README for the 'How to Python Code' repo",
@@ -16,7 +16,7 @@ setuptools.setup(
     install_requires=[
         "feedparser>=6",
         "beautifulsoup4>=4",
-        "SnakeMD>=0"
+        "SnakeMD>=2"
     ],
     entry_points={
         "console_scripts": [
@@ -25,6 +25,8 @@ setuptools.setup(
     },
     classifiers=(
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License"

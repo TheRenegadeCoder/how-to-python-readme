@@ -3,9 +3,9 @@ import logging
 from typing import Optional
 
 import feedparser
+import requests
 from bs4 import BeautifulSoup
-from snakemd import Document, InlineText, Table
-
+from snakemd import Document, Inline, Table
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def main() -> None:
         raise ValueError(f'Invalid log level: {loglevel}')
     logging.basicConfig(level=numeric_level)
     how_to = HowTo()
-    how_to.page.output_page("")
+    how_to.page.dump("README")
 
 
 def _get_log_level() -> str:
@@ -70,7 +70,7 @@ def get_series_posts() -> list:
     return feed
 
 
-def get_youtube_video(entry) -> InlineText:
+def get_youtube_video(entry) -> Inline:
     """
     Generates an InlineText item corresponding to the YouTube
     video link if it exists. Otherwise, it returns an empty
@@ -81,41 +81,84 @@ def get_youtube_video(entry) -> InlineText:
     """
     content = entry.content[0].value
     soup = BeautifulSoup(content, "html.parser")
-    target = soup.find("h2", text="Video Summary")
+    target = soup.find("h2", string="Video Summary")
     if target:
         url = target.find_next_sibling().find_all("a")[-1]["href"]
-        return InlineText("Video", url=url)
-    return InlineText("")
+        return Inline("Video", link=url)
+    return Inline("")
 
 
 def get_slug(title: str, sep: str) -> str:
+    """
+    Converts a title to a slug.
+
+    :param title: title of item
+    :param sep: the separator to use in place of whitespace
+    :return: a slug from a title
+    """
     return title.split(":")[0][:-10].lower().replace(" ", sep)
 
 
-def get_challenge(title: str) -> InlineText:
+def verify_url(url: str) -> bool:
+    """
+    Checks that a URL exists. 
+
+    :param url: the URL to verify
+    :return: True if the URL exists; False otherwise
+    """
+    try:
+        r = requests.get(url)
+        if r.status_code == 404:
+            logger.debug(f"URL does not exist: {url}")
+            return False
+    except:
+        logger.warning(f"Issue loading URL: {url}")
+        return False
+    return True
+
+
+def get_challenge(title: str) -> Inline:
+    """
+    Retrieves the link to the challenge code samples.
+
+    :param title: the title of the article
+    :return: the link to the challenge folder, if it exists
+    """
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
-    challenge = InlineText("Challenge", url=f"{base}{slug}")
-    if not challenge.verify_url():
-        return InlineText("")
+    challenge = Inline("Challenge", link=f"{base}{slug}")
+    if not verify_url(challenge._link):
+        return Inline("")
     return challenge
 
 
-def get_notebook(title: str) -> InlineText:
+def get_notebook(title: str) -> Inline:
+    """
+    Retrieves the link to the Jupyter Notebook for the article.
+
+    :param title: the title of the article
+    :return: the link to the notebook, if it exists
+    """
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/notebooks/"
-    notebook = InlineText("Notebook", f"{base}{slug}.ipynb")
-    if not notebook.verify_url():
-        return InlineText("")
+    notebook = Inline("Notebook", link=f"{base}{slug}.ipynb")
+    if not verify_url(notebook._link):
+        return Inline("")
     return notebook
 
 
-def get_test(title: str) -> InlineText:
+def get_test(title: str) -> Inline:
+    """
+    Retrieves the test file for the article.
+
+    :param title: the title of the article
+    :return: the link to the test, if it exists
+    """
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/testing/"
-    test = InlineText("Test", f"{base}{slug}.py")
-    if not test.verify_url():
-        return InlineText("")
+    test = Inline("Test", link=f"{base}{slug}.py")
+    if not verify_url(test._link):
+        return Inline("")
     return test
 
 
@@ -130,10 +173,10 @@ class HowTo:
         self.feed = get_series_posts()
 
     def _build_readme(self):
-        self.page = Document("README")
+        self.page = Document()
 
         # Introduction
-        self.page.add_header("How to Python - Source Code")
+        self.page.add_heading("How to Python - Source Code")
         self.page.add_paragraph(_get_intro_text()) \
             .insert_link("How to Python", "https://therenegadecoder.com/series/how-to-python/") \
             .insert_link(
@@ -153,25 +196,25 @@ class HowTo:
             "Testing"
         ]
         table = Table(
-            [InlineText(header) for header in headers],
+            [Inline(header) for header in headers],
             self.build_table()
         )
-        self.page.add_element(table)
+        self.page.add_block(table)
 
-    def build_table(self) -> list[list[InlineText]]:
+    def build_table(self) -> list[list[Inline]]:
         index = 1
         body = []
         for entry in self.feed:
             if "Code Snippets" not in entry.title:
-                article = InlineText("Article", url=entry.link)
+                article = Inline("Article", link=entry.link)
                 youtube = get_youtube_video(entry)
                 challenge = get_challenge(entry.title)
                 notebook = get_notebook(entry.title)
                 test = get_test(entry.title)
                 body.append([
-                    InlineText(str(index)),
-                    InlineText(entry.title),
-                    InlineText(entry.published),
+                    Inline(str(index)),
+                    Inline(entry.title),
+                    Inline(entry.published),
                     article,
                     youtube,
                     challenge,
