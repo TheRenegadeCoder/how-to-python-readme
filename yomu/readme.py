@@ -3,9 +3,9 @@ import logging
 from typing import Optional
 
 import feedparser
+import requests
 from bs4 import BeautifulSoup
 from snakemd import Document, Inline, Table
-
 
 logger = logging.getLogger(__name__)
 
@@ -92,11 +92,19 @@ def get_slug(title: str, sep: str) -> str:
     return title.split(":")[0][:-10].lower().replace(" ", sep)
 
 
+def verify_url(url: str) -> bool:
+    try:
+        r = requests.get(url)
+    except:
+        return False
+    return True
+
+
 def get_challenge(title: str) -> Inline:
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
     challenge = Inline("Challenge", link=f"{base}{slug}")
-    if not challenge.verify_url():
+    if not verify_url(challenge._link):
         return Inline("")
     return challenge
 
@@ -105,7 +113,7 @@ def get_notebook(title: str) -> Inline:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/notebooks/"
     notebook = Inline("Notebook", f"{base}{slug}.ipynb")
-    if not notebook.verify_url():
+    if not verify_url(notebook._link):
         return Inline("")
     return notebook
 
@@ -114,7 +122,7 @@ def get_test(title: str) -> Inline:
     slug = get_slug(title, "_")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/testing/"
     test = Inline("Test", f"{base}{slug}.py")
-    if not test.verify_url():
+    if not verify_url(test._link):
         return Inline("")
     return test
 
