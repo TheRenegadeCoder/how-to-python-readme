@@ -22,7 +22,7 @@ def main() -> None:
         raise ValueError(f'Invalid log level: {loglevel}')
     logging.basicConfig(level=numeric_level)
     how_to = HowTo()
-    how_to.page.output_page("")
+    how_to.page.dump("README")
 
 
 def _get_log_level() -> str:
@@ -130,7 +130,7 @@ class HowTo:
         self.feed = get_series_posts()
 
     def _build_readme(self):
-        self.page = Document("README")
+        self.page = Document()
 
         # Introduction
         self.page.add_header("How to Python - Source Code")
