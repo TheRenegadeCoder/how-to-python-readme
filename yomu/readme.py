@@ -81,7 +81,7 @@ def get_youtube_video(entry) -> Inline:
     """
     content = entry.content[0].value
     soup = BeautifulSoup(content, "html.parser")
-    target = soup.find("h2", text="Video Summary")
+    target = soup.find("h2", string="Video Summary")
     if target:
         url = target.find_next_sibling().find_all("a")[-1]["href"]
         return Inline("Video", link=url)
