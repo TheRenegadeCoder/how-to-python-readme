@@ -84,7 +84,7 @@ def get_youtube_video(entry) -> Inline:
     target = soup.find("h2", text="Video Summary")
     if target:
         url = target.find_next_sibling().find_all("a")[-1]["href"]
-        return Inline("Video", url=url)
+        return Inline("Video", link=url)
     return Inline("")
 
 
@@ -95,7 +95,7 @@ def get_slug(title: str, sep: str) -> str:
 def get_challenge(title: str) -> Inline:
     slug = get_slug(title, "-")
     base = "https://github.com/TheRenegadeCoder/how-to-python-code/tree/main/challenges/"
-    challenge = Inline("Challenge", url=f"{base}{slug}")
+    challenge = Inline("Challenge", link=f"{base}{slug}")
     if not challenge.verify_url():
         return Inline("")
     return challenge
@@ -163,7 +163,7 @@ class HowTo:
         body = []
         for entry in self.feed:
             if "Code Snippets" not in entry.title:
-                article = Inline("Article", url=entry.link)
+                article = Inline("Article", link=entry.link)
                 youtube = get_youtube_video(entry)
                 challenge = get_challenge(entry.title)
                 notebook = get_notebook(entry.title)
